@@ -1,9 +1,16 @@
+//Importing REquired packages
 const fs = require('fs');
+const express = require("express");
 const readline = require('readline');
-const {
-    google
-} = require('googleapis');
-
+const {google} = require('googleapis');
+const app = express();
+let autth;
+let from;
+let to;
+let subject;
+let body;
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({extended: true}));
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.modify',
     'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.send'
@@ -20,12 +27,7 @@ fs.readFile('credentials.json', (err, content) => {
     authorize(JSON.parse(content), listLabels);
 });
 
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
+//this function is used to check the credential of user
 function authorize(credentials, callback) {
     const {
         client_secret,
@@ -43,12 +45,7 @@ function authorize(credentials, callback) {
     });
 }
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
+//this function generates new token by giving a token link and field to enter it
 function getNewToken(oAuth2Client, callback) {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
@@ -80,6 +77,7 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listLabels(auth) {
+    autth = auth;
     const gmail = google.gmail({
         version: 'v1',
         auth
@@ -87,7 +85,6 @@ function listLabels(auth) {
     gmail.users.labels.list({
         userId: 'me',
     }, (err, res) => {
-      console.log(gmail)
         if (err) return console.log('The API returned an error: ' + err);
         const labels = res.data.labels;
         if (labels.length) {
@@ -95,15 +92,38 @@ function listLabels(auth) {
             labels.forEach((label) => {
                 console.log(`- ${label.name}`);
             });
-            var Mail = require('./mail.js');
-            var obj = new Mail(auth, "arvindozha359@gmail.com", 'Subject', 'Body', 'mail', []);
-            console.log(obj);
-            //'mail' is the task, if not passed it will save the message as draft.
-            //attachmentSrc array is optional.
-            obj.makeBody();
-            //This will send the mail to the recipent.
+            autth = auth;
         } else {
             console.log('No labels found.');
         }
     });
 }
+// call this route with all the keys
+app.post("/compose", function (req, res) {
+    from = req.body.from;
+    to = req.body.to;
+    subject = req.body.subject
+    body = req.body.body
+    getAuth(autth)
+    res.send("mail saved")
+    
+})
+function getAuth(auth) {
+    var Mail = require('./mail.js');
+    var obj = new Mail(auth, from, to, subject, body, 'mail');
+    //'mail' is the task, if not passed it will save the message as draft.
+    //attachmentSrc array is optional.
+    console.log("run");
+    obj.makeBody();
+    //This will send the mail to the recipent.
+}
+
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+    port = 3000;
+}
+//port configuration
+app.listen(port, function () {
+    console.log("server is running");
+});

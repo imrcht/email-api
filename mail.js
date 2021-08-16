@@ -1,12 +1,10 @@
-const {
-    google
-} = require('googleapis');
+const {google} = require('googleapis');
 const mailComposer = require('nodemailer/lib/mail-composer');
 
 class CreateMail {
 
-    constructor(auth, to, sub, body, task, attatchmentSrc=[]) {
-        this.me = 'ks15raj@gmail.com';
+    constructor(auth, from, to, sub, body, task, attatchmentSrc=[]) {
+        this.me = from;
         this.task = task;
         this.auth = auth;
         this.to = to;
@@ -16,7 +14,6 @@ class CreateMail {
             version: 'v1',
             auth
         });
-        this.attatchment = attatchmentSrc;
 
     }
 
@@ -31,22 +28,14 @@ class CreateMail {
         }
         let mail;
         //Mail Body is created.
-        if (0) {
-            mail = new mailComposer({
-                to: this.to,
-                text: this.body,
-                subject: this.sub,
-                textEncoding: "base64",
-                attachments: arr
-            });
-        } else {
+        
             mail = new mailComposer({
                 to: this.to,
                 text: this.body,
                 subject: this.sub,
                 textEncoding: "base64"
             });
-        }
+        
 
         //Compiles and encodes the mail.
         mail.compile().build((err, msg) => {
