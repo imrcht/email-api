@@ -5,8 +5,8 @@ const mailComposer = require('nodemailer/lib/mail-composer');
 
 class CreateMail {
 
-    constructor(auth, to, sub, body, task, attachmentSrc=[]) {
-        this.me = 'arvindozha359@gmail.com';
+    constructor(auth, to, sub, body, task, attatchmentSrc=[]) {
+        this.me = 'ks15raj@gmail.com';
         this.task = task;
         this.auth = auth;
         this.to = to;
@@ -16,14 +16,14 @@ class CreateMail {
             version: 'v1',
             auth
         });
-        this.attatchment = attachmentSrc;
+        this.attatchment = attatchmentSrc;
 
     }
 
     //Creates the mail body and encodes it to base64 format.
     makeBody() {
         var arr = [];
-        for (var i = 0; i < this.attachment.length; i++) {
+        for (var i = 0; i < 0; i++) {
             arr[i] = {
                 path: this.attachment[i],
                 encoding: 'base64'
@@ -31,7 +31,7 @@ class CreateMail {
         }
         let mail;
         //Mail Body is created.
-        if (this.attachment.length) {
+        if (0) {
             mail = new mailComposer({
                 to: this.to,
                 text: this.body,
