@@ -4,7 +4,7 @@ const express = require("express");
 const readline = require("readline");
 const { google } = require("googleapis");
 const app = express();
-let autth;
+let authen;
 let from;
 let to;
 let subject;
@@ -79,7 +79,7 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listLabels(auth) {
-	autth = auth;
+	authen = auth;
 	const gmail = google.gmail({
 		version: "v1",
 		auth,
@@ -96,7 +96,7 @@ function listLabels(auth) {
 				labels.forEach((label) => {
 					console.log(`- ${label.name}`);
 				});
-				autth = auth;
+				authen = auth;
 			} else {
 				console.log("No labels found.");
 			}
@@ -109,7 +109,7 @@ app.post("/compose", function (req, res) {
 	to = req.body.to;
 	subject = req.body.subject;
 	body = req.body.body;
-	getAuth(autth);
+	getAuth(authen);
 	res.send("mail saved");
 });
 function getAuth(auth) {
